@@ -35,7 +35,9 @@ test.skip = function(desc) {
 export { test as describe, test as it, test as default }
 
 export function before(fn) {
-  Promise.resolve().then(() => fn(assert))
+  Promise.resolve().then(() =>
+    (only.length ? only : normal).unshift(() => fn(assert))
+  )
 }
 
 export function after(fn) {
