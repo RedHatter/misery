@@ -1,4 +1,4 @@
-import { indent, deindent, log, plan } from './report.js'
+import { AssertError, indent, deindent, log, plan } from './report.js'
 import * as assert from './assert.js'
 
 function _test(list, desc, spec) {
@@ -39,7 +39,9 @@ export async function run() {
     try {
       await fn()
     } catch (err) {
+      if (!(err instanceof AssertError)) console.error(err)
       log('Aborting test, see above')
+      deindent()
     }
 
     queue.unshift(...(only.length ? only : normal))

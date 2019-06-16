@@ -1,3 +1,10 @@
+export class AssertError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
 export let assertCount = 1
 
 export const deindent = console.groupEnd
@@ -33,7 +40,7 @@ export function notOk(msg, detail) {
     ),
     ' ...\n'
   )
-  throw new Error()
+  throw new AssertError(msg)
 }
 
 export function plan() {
