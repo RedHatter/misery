@@ -1,0 +1,19 @@
+{
+  "name": "misery",
+  "version": "0.0.1",
+  "description": "A stupid simple in browser TAP compatable testing framework.",
+  "license": "MIT",
+  "repository": "github:RedHatter/misery",
+  "scripts": {
+    "build": "npm run build:format && rollup -c",
+    "build:format": "prettier --no-semi --single-quote --write src/*",
+    "prepare": "npm run build"
+  },
+  "main": "dist/index.js",
+  "module": "src/index.js",
+  "type": "module",
+  "devDependencies": {
+    "prettier": "^1.18.2",
+    "rollup": "^1.15.5"
+  }
+}
