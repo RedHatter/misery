@@ -1,6 +1,8 @@
 import { AssertError, indent, deindent, log, error, done } from './report.js'
 import * as assert from './assert.js'
 
+let context = { ...assert }
+
 function _test(list, desc, spec) {
   if (!spec) {
     log('TODO ' + desc)
@@ -9,8 +11,13 @@ function _test(list, desc, spec) {
 
   const fn = async () => {
     indent(desc)
-    await spec(assert)
-    list.push(deindent)
+    let _context = context
+    context = { ..._context }
+    await spec(_context)
+    list.push(() => {
+      deindent()
+      context = _context
+    })
   }
 
   fn.isTest = true
