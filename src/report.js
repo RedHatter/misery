@@ -6,6 +6,9 @@ export class AssertError extends Error {
 }
 
 export let assertCount = 1
+export let passCount = 0
+export let failCount = 0
+export let errorCount = 0
 
 export const deindent = console.groupEnd
 
@@ -17,11 +20,18 @@ export function log(msg) {
   console.log('#', msg)
 }
 
+export function error(err) {
+  errorCount++
+  console.error(err)
+}
+
 export function ok(msg) {
+  passCount++
   console.log('ok', assertCount++, msg)
 }
 
 export function notOk(msg, detail) {
+  failCount++
   const length =
     Object.keys(detail).reduce(
       (max, o) => (o.length > max ? o.length : max),
@@ -43,6 +53,11 @@ export function notOk(msg, detail) {
   throw new AssertError(msg)
 }
 
-export function plan() {
-  console.log('1..' + (assertCount - 1))
+export function done() {
+  console.log(`
+1..${assertCount - 1}
+# tests ${assertCount - 1}
+# pass  ${passCount}
+${failCount ? '# fail  ' + failCount : ''}
+${errorCount ? '# error ' + errorCount : !failCount ? '# ok' : ''}`)
 }

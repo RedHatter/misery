@@ -1,4 +1,4 @@
-import { AssertError, indent, deindent, log, plan } from './report.js'
+import { AssertError, indent, deindent, log, error, done } from './report.js'
 import * as assert from './assert.js'
 
 function _test(list, desc, spec) {
@@ -79,7 +79,7 @@ export async function run() {
     try {
       await fn()
     } catch (err) {
-      if (!(err instanceof AssertError)) console.error(err)
+      if (!(err instanceof AssertError)) error(err)
       log('Aborting test, see above')
       deindent()
     }
@@ -90,7 +90,7 @@ export async function run() {
     fn = queue.shift()
   }
 
-  plan()
+  done()
 }
 
 Promise.resolve().then(run)
