@@ -1,7 +1,7 @@
 import { AssertError, indent, deindent, log, error, done } from './report.js'
 import * as assert from './assert.js'
 
-let context = { ...assert }
+let currentContext = { ...assert, __metadata: { desc: '' } }
 
 function _test(list, desc, spec) {
   if (!spec) {
@@ -11,15 +11,22 @@ function _test(list, desc, spec) {
 
   const fn = async () => {
     indent(desc)
-    let _context = context
-    _context.__metadata = {
-      desc: context.__metadata ? `${context.__metadata.desc}: ${desc}` : desc
+    const parentContext = currentContext
+    const context = {
+      ...currentContext,
+      __metadata: {
+        desc: `${parentContext.__metadata.desc}${desc}: `
+      }
     }
-    context = { ..._context }
-    await spec(_context)
+
+    currentContext = context
+    const parentDesc = parentContext.__metadata.desc
+    parentContext.__metadata.desc += desc
+    await spec(parentContext)
+    parentContext.__metadata.desc = parentDesc
     list.push(() => {
       deindent()
-      context = _context
+      currentContext = parentContext
     })
   }
 
@@ -45,37 +52,41 @@ test.skip = function(desc) {
 export { test as describe, test as it, test as default }
 
 export function before(fn) {
+  const context = currentContext
   Promise.resolve().then(() =>
-    (only.length ? only : normal).unshift(() => fn(assert))
+    (only.length ? only : normal).unshift(() => fn(context))
   )
 }
 
 export function after(fn) {
+  const context = currentContext
   Promise.resolve().then(() =>
-    (only.length ? only : normal).push(() => fn(assert))
+    (only.length ? only : normal).push(() => fn(context))
   )
 }
 
 export function beforeEach(fn) {
+  const context = currentContext
   Promise.resolve().then(() => {
     for (let i = normal.length - 1; i >= 0; i--) {
-      if (normal[i].isTest) normal.splice(i, 0, () => fn(assert))
+      if (normal[i].isTest) normal.splice(i, 0, () => fn(context))
     }
 
     for (let i = only.length - 1; i >= 0; i--) {
-      if (only[i].isTest) only.splice(i, 0, () => fn(assert))
+      if (only[i].isTest) only.splice(i, 0, () => fn(context))
     }
   })
 }
 
 export function afterEach(fn) {
+  const context = currentContext
   Promise.resolve().then(() => {
     for (let i = normal.length - 1; i >= 0; i--) {
-      if (normal[i].isTest) normal.splice(i + 1, 0, () => fn(assert))
+      if (normal[i].isTest) normal.splice(i + 1, 0, () => fn(context))
     }
 
     for (let i = only.length - 1; i >= 0; i--) {
-      if (only[i].isTest) only.splice(i + 1, 0, () => fn(assert))
+      if (only[i].isTest) only.splice(i + 1, 0, () => fn(context))
     }
   })
 }
