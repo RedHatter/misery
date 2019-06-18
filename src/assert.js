@@ -37,10 +37,10 @@ export function notEqual(actual, expected, msg = 'should not be equal') {
 }
 
 export function snapshot(actual, name, msg = 'should match snapshot') {
-  if (!this.__metadata.snapshotIndex) this.__metadata.snapshotIndex = 0
-  this.__metadata.snapshotIndex++
+  if (!('snapshotIndex' in this.__metadata)) this.__metadata.snapshotIndex = 0
+
   const id = `misery snapshot: ${this.__metadata.desc}: ${name ||
-    this.__metadata.snapshotIndex}`
+    this.__metadata.snapshotIndex++}`
   const expected = localStorage.getItem(id)
   if (expected == null) {
     localStorage.setItem(id, JSON.stringify(actual))
