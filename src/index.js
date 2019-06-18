@@ -24,7 +24,7 @@ function _test(list, desc, spec) {
     parentContext.__metadata.desc += desc
     await spec(parentContext)
     parentContext.__metadata.desc = parentDesc
-    list.push(() => {
+    getList().push(() => {
       deindent()
       currentContext = parentContext
     })
@@ -51,18 +51,18 @@ test.skip = function(desc) {
 
 export { test as describe, test as it, test as default }
 
+function getList () {
+  return only.length ? only : normal
+}
+
 export function before(fn) {
   const context = currentContext
-  Promise.resolve().then(() =>
-    (only.length ? only : normal).unshift(() => fn(context))
-  )
+  Promise.resolve().then(() => getList().unshift(() => fn(context)))
 }
 
 export function after(fn) {
   const context = currentContext
-  Promise.resolve().then(() =>
-    (only.length ? only : normal).push(() => fn(context))
-  )
+  Promise.resolve().then(() => getList().push(() => fn(context)))
 }
 
 export function beforeEach(fn) {
@@ -105,7 +105,7 @@ export async function run() {
       deindent()
     }
 
-    queue.unshift(...(only.length ? only : normal))
+    queue.unshift(...getList())
     only.length = 0
     normal.length = 0
     fn = queue.shift()
