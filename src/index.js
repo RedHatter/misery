@@ -3,7 +3,13 @@ import * as assert from './assert.js'
 
 let currentContext = { ...assert, __metadata: { desc: '' } }
 
-function _test(list, desc, spec) {
+let normal = []
+let only = []
+function getList() {
+  return only.length ? only : normal
+}
+
+export function test(desc, spec, isOnly) {
   if (!spec) {
     log('TODO ' + desc)
     return
@@ -31,18 +37,11 @@ function _test(list, desc, spec) {
   }
 
   fn.isTest = true
-
-  list.push(fn)
+  ;(isOnly ? only : normal).push(fn)
 }
 
-let normal = []
-export function test(desc, spec) {
-  _test(normal, desc, spec)
-}
-
-let only = []
 test.only = function(desc, spec) {
-  _test(only, desc, spec)
+  test(desc, spec, true)
 }
 
 test.skip = function(desc) {
@@ -50,10 +49,6 @@ test.skip = function(desc) {
 }
 
 export { test as describe, test as it, test as default }
-
-function getList () {
-  return only.length ? only : normal
-}
 
 export function before(fn) {
   const context = currentContext
@@ -106,8 +101,8 @@ export async function run() {
     }
 
     queue.unshift(...getList())
-    only.length = 0
-    normal.length = 0
+    only = []
+    normal = []
     fn = queue.shift()
   }
 
