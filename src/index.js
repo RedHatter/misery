@@ -12,7 +12,9 @@ function _test(list, desc, spec) {
   const fn = async () => {
     indent(desc)
     let _context = context
-    _context.__metadata = { desc: context.__metadata ? `${context.__metadata.desc}: ${desc}` : desc }
+    _context.__metadata = {
+      desc: context.__metadata ? `${context.__metadata.desc}: ${desc}` : desc
+    }
     context = { ..._context }
     await spec(_context)
     list.push(() => {

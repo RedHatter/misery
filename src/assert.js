@@ -35,3 +35,25 @@ export function notEqual(actual, expected, msg = 'should not be equal') {
   if (expected != actual) report.ok(msg)
   else report.notOk(msg, { operator: 'equal', expected, actual })
 }
+
+export function snapshot(actual, name, msg = 'should match snapshot') {
+  if (!this.__metadata.snapshotIndex) this.__metadata.snapshotIndex = 0
+  this.__metadata.snapshotIndex++
+  const id = `misery snapshot: ${this.__metadata.desc}: ${name ||
+    this.__metadata.snapshotIndex}`
+  const expected = localStorage.getItem(id)
+  if (expected == null) {
+    localStorage.setItem(id, JSON.stringify(actual))
+    report.ok(msg)
+    report.log('Empty snapshot set')
+  } else if (expected == JSON.stringify(actual)) {
+    report.ok(msg)
+  } else {
+    report.log('To update snapshot clear localStorage and re-run test')
+    report.notOk(msg, {
+      operator: 'snapshot',
+      expected: JSON.parse(expected),
+      actual
+    })
+  }
+}
