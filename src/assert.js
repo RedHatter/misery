@@ -21,6 +21,10 @@ export function fail(msg) {
   report.notOk(msg, { operator: 'fail' })
 }
 
+export function pass(msg) {
+  report.ok(msg)
+}
+
 export function ok(condition, msg = 'should be truthy') {
   if (condition) report.ok(msg)
   else report.notOk(msg, { operator: 'ok', expected: true, actual: condition })
